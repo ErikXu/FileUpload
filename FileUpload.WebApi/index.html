@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    Title : <input type="text" class="form-control" data-bind="value:title"><br/>
+    Content: <input type="text" class="form-control" data-bind="value:content"><br />
+    <input type="file" class="form-control" data-bind="value:fileName, event:{change:fileChange($element.files[0])}">
+    <button type="button" data-bind="click:save">Save</button>
+    <script src="lib/jquery/jquery-2.1.1.min.js"></script>
+    <script src="lib/knockout/knockout-3.1.0.js"></script>
+    <script src="lib/http.js"></script>
+    <script type="text/javascript">
+        function Model() {
+            var self = this;
+            self.title = ko.observable();
+            self.content = ko.observable();
+            self.file = ko.observable();
+            self.fileName = ko.observable();
+
+            self.fileChange = function (input) {
+                self.file(input);
+            };
+
+            self.save = function () {
+                var data = new FormData();
+                data.append('file', self.file());
+                data.append('form', ko.toJSON({ title: self.title(), content: self.content() }));
+                return $http.post('api/files', null, { contentType: false, processData: false, data: data});
+            };
+        }
+
+        $(function () {
+            var model = new Model();
+            ko.applyBindings(model);
+        });
+    </script>
+
+</body>
+</html>
